@@ -7,6 +7,7 @@
     <version>0.2-SNAPSHOT</version>
     <name>Spring Security OAuth2 for Canvas</name>
     <description>This small project provides some supporting classes for using Spring Security OAuth2 with Canvas.</description>
+    <url>https://github.com/oxctl/canvas-spring-oauth2</url>
 
     <organization>
         <name>Centre for Teaching and Learning, University of Oxford</name>
