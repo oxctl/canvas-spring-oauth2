@@ -24,3 +24,8 @@ then if that completes successfully a release bundle can be pushed to the stagin
     mvn -Prelease release:perform
     
 We don't automatically close the staged artifacts so after checking that the files are ok you can login to the [repository](https://oss.sonatype.org/) and release it.
+
+License
+-------
+
+This project is Apache 2 licensed.
