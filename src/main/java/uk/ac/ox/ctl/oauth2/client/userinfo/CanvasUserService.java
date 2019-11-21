@@ -17,10 +17,12 @@ import java.util.Set;
  * In this situation when the user is returned from Canvas details about them are included in the response.
  */
 public class CanvasUserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+
+    @SuppressWarnings("unchecked")
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         Object object = userRequest.getAdditionalParameters().get("user");
-        if ((object instanceof Map)) {
+        if (object instanceof Map) {
             Map<String, Object> user = (Map<String, Object>)object;
             OAuth2UserAuthority oAuth2UserAuthority = new OAuth2UserAuthority(user);
             Set<GrantedAuthority> authorities = Collections.singleton(oAuth2UserAuthority);
