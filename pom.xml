@@ -4,7 +4,7 @@
 
     <groupId>uk.ac.ox.ctl</groupId>
     <artifactId>canvas-spring-oauth2</artifactId>
-    <version>0.3</version>
+    <version>0.4-SNAPSHOT</version>
     <name>Spring Security OAuth2 for Canvas</name>
     <description>This small project provides some supporting classes for using Spring Security OAuth2 with Canvas.</description>
     <url>https://github.com/oxctl/canvas-spring-oauth2</url>
@@ -18,7 +18,7 @@
         <connection>scm:git:ssh://git@github.com/oxctl/canvas-spring-oauth2.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/oxctl/canvas-spring-oauth2.git</developerConnection>
         <url>https://github.com/oxctl/canvas-spring-oauth2</url>
-        <tag>canvas-spring-oauth2-0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
