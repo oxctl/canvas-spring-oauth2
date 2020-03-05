@@ -130,17 +130,22 @@ public final class OAuth2AuthorizedClientArgumentResolver implements HandlerMeth
       return null;
     }
 
-    if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(
-        clientRegistration.getAuthorizationGrantType())) {
-      throw new ClientAuthorizationRequiredException(clientRegistrationId);
-    }
+    RegisteredOAuth2AuthorizedClient mergedAnnotation = AnnotatedElementUtils.findMergedAnnotation(
+            parameter.getParameter(), RegisteredOAuth2AuthorizedClient.class);
+    if (mergedAnnotation.required()) {
 
-    if (AuthorizationGrantType.CLIENT_CREDENTIALS.equals(
-        clientRegistration.getAuthorizationGrantType())) {
-      HttpServletResponse servletResponse = webRequest.getNativeResponse(HttpServletResponse.class);
-      authorizedClient =
-          this.authorizeClientCredentialsClient(
-              clientRegistration, servletRequest, servletResponse);
+      if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(
+              clientRegistration.getAuthorizationGrantType())) {
+        throw new ClientAuthorizationRequiredException(clientRegistrationId);
+      }
+
+      if (AuthorizationGrantType.CLIENT_CREDENTIALS.equals(
+              clientRegistration.getAuthorizationGrantType())) {
+        HttpServletResponse servletResponse = webRequest.getNativeResponse(HttpServletResponse.class);
+        authorizedClient =
+                this.authorizeClientCredentialsClient(
+                        clientRegistration, servletRequest, servletResponse);
+      }
     }
 
     return authorizedClient;

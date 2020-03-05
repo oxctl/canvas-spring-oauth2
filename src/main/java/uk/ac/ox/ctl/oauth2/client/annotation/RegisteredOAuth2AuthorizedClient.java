@@ -63,4 +63,10 @@ public @interface RegisteredOAuth2AuthorizedClient {
    */
   @AliasFor("registrationId")
   String value() default "";
+
+  /**
+   * Set if this OAuth2AuthorizedClient is required.
+   * @return if the parameter is required.
+   */
+  boolean required() default true;
 }
