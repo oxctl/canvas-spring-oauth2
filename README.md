@@ -1,7 +1,7 @@
 Canvas Spring Security OAuth2
 =============================
 
-[![Build Status](https://travis-ci.com/oxctl/canvas-spring-oauth2.svg?branch=master)](https://travis-ci.com/oxctl/canvas-spring-oauth2)
+[![Java CI with Maven](https://github.com/oxctl/canvas-spring-oauth2/actions/workflows/maven.yml/badge.svg)](https://github.com/oxctl/canvas-spring-oauth2/actions/workflows/maven.yml)
 
 This project contains a few supporting files for building Spring Security OAuth2 client that work well with the [Canvas](https://www.instructure.com/canvas/) LMS by [Instructure](https://www.instructure.com/). There is documentation of their [OAuth2](https://canvas.instructure.com/doc/api/file.oauth.html) setup which may be helpful in understanding this library.
 
