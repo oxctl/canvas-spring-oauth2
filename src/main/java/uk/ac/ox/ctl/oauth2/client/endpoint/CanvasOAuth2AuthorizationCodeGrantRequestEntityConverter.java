@@ -19,6 +19,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -86,10 +87,13 @@ public class CanvasOAuth2AuthorizationCodeGrantRequestEntityConverter
         authorizationExchange.getAuthorizationRequest().getRedirectUri());
     // This is the special Canvas bit.
     formParameters.add(REPLACE_TOKENS, REPLACE_TOKENS_VALUE);
-    if (ClientAuthenticationMethod.POST.equals(
+    if (ClientAuthenticationMethod.CLIENT_SECRET_POST.equals(clientRegistration.getClientAuthenticationMethod()) || ClientAuthenticationMethod.POST.equals(
         clientRegistration.getClientAuthenticationMethod())) {
       formParameters.add(OAuth2ParameterNames.CLIENT_ID, clientRegistration.getClientId());
       formParameters.add(OAuth2ParameterNames.CLIENT_SECRET, clientRegistration.getClientSecret());
+    } else {
+      // Maybe we should validate the client registration before we start
+      throw new InternalAuthenticationServiceException("Client Registration "+ clientRegistration.getClientId() + " can't be supported with a client authentication of: "+ clientRegistration.getClientAuthenticationMethod());
     }
 
     return formParameters;
