@@ -69,4 +69,10 @@ public @interface RegisteredOAuth2AuthorizedClient {
    * @return if the parameter is required.
    */
   boolean required() default true;
+
+  /**
+   * Set if the existing authorized client should be deleted so we get another one.
+   * @return if any existing authorized client should be deleted.
+   */
+  boolean renew() default false;
 }
