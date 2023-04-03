@@ -17,7 +17,6 @@ package uk.ac.ox.ctl.oauth2.client.web.method.annotation;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +29,8 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -97,7 +98,6 @@ public final class OAuth2AuthorizedClientArgumentResolver implements HandlerMeth
             != null));
   }
 
-  @NonNull
   @Override
   public Object resolveArgument(
       MethodParameter parameter,
@@ -105,35 +105,39 @@ public final class OAuth2AuthorizedClientArgumentResolver implements HandlerMeth
       NativeWebRequest webRequest,
       @Nullable WebDataBinderFactory binderFactory)
       throws Exception {
-
+    RegisteredOAuth2AuthorizedClient mergedAnnotation = AnnotatedElementUtils.findMergedAnnotation(
+            parameter.getParameter(), RegisteredOAuth2AuthorizedClient.class);
+    
     String clientRegistrationId = this.resolveClientRegistrationId(parameter);
-    if (StringUtils.isEmpty(clientRegistrationId)) {
-      throw new IllegalArgumentException(
-          "Unable to resolve the Client Registration Identifier. "
-              + "It must be provided via @RegisteredOAuth2AuthorizedClient(\"client1\") or "
-              + "@RegisteredOAuth2AuthorizedClient(registrationId = \"client1\").");
+    if (clientRegistrationId == null) {
+      throw new OAuth2AuthorizationException(
+              new OAuth2Error("invalid_request", "No client registration ID", null)
+      );
+    }
+    ClientRegistration clientRegistration = this.clientRegistrationRepository
+            .findByRegistrationId(clientRegistrationId);
+    if (clientRegistration == null) {
+      throw new OAuth2AuthorizationException(
+              new OAuth2Error("invalid_request", "Unknown client registration ID: "+ clientRegistrationId, null)
+      );
     }
 
     Authentication principal = SecurityContextHolder.getContext().getAuthentication();
     HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
-
-    OAuth2AuthorizedClient authorizedClient =
-        this.authorizedClientRepository.loadAuthorizedClient(
-            clientRegistrationId, principal, servletRequest);
-    if (authorizedClient != null) {
-      return authorizedClient;
+    OAuth2AuthorizedClient authorizedClient = null;
+    if (mergedAnnotation.renew()) {
+      // We don't have 
+      HttpServletResponse servletResponse = webRequest.getNativeResponse(HttpServletResponse.class);
+      authorizedClientRepository.removeAuthorizedClient(clientRegistration.getClientId(), principal, servletRequest, servletResponse);
+    } else {
+      authorizedClient = this.authorizedClientRepository
+              .loadAuthorizedClient(clientRegistrationId, principal, servletRequest);
+      if (authorizedClient != null) {
+        return authorizedClient;
+      }
     }
 
-    ClientRegistration clientRegistration =
-        this.clientRegistrationRepository.findByRegistrationId(clientRegistrationId);
-    if (clientRegistration == null) {
-      return null;
-    }
-
-    RegisteredOAuth2AuthorizedClient mergedAnnotation = AnnotatedElementUtils.findMergedAnnotation(
-            parameter.getParameter(), RegisteredOAuth2AuthorizedClient.class);
     if (mergedAnnotation.required()) {
-
       if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(
               clientRegistration.getAuthorizationGrantType())) {
         throw new ClientAuthorizationRequiredException(clientRegistrationId);
